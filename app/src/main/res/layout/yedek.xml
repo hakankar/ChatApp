@@ -1,31 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+ <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.karyagdi.hakan.chatapp.MainActivity">
+<!--
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_marginBottom="46dp"
-        tools:context="com.karyagdi.hakan.chatapp.MainActivity">
-    </LinearLayout>
     <ListView
         android:id="@+id/list_of_message"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:dividerHeight="16dp"
         android:divider="@android:color/transparent"
-
+        android:layout_marginBottom="46dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></ListView>
+        android:layout_height="match_parent"
+        android:layout_toEndOf="@id/send_layout"></ListView>
 
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/send_layout"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/layout_bg"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="5dp">
         <android.support.design.widget.FloatingActionButton
             android:layout_width="33dp"
             android:layout_height="33dp"
@@ -41,17 +45,18 @@
             />
         <EditText
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:hint="Message..."
             android:id="@+id/txtMessage"
             android:layout_alignParentBottom="true"
             android:layout_toLeftOf="@id/btnSendMessage"
             android:layout_marginLeft="15dp"
             />
-      <!--  <android.support.design.widget.TextInputLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_toLeftOf="@id/btnSendMessage"
-            android:layout_alignParentStart="true"/>-->
+        cmmnt  <android.support.design.widget.TextInputLayout
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignParentBottom="true"
+              android:layout_toLeftOf="@id/btnSendMessage"
+              android:layout_alignParentStart="true"/>
+    </RelativeLayout>-->
 </RelativeLayout>

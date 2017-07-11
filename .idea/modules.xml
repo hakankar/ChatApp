@@ -3,7 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ChatApp.iml" filepath="$PROJECT_DIR$/ChatApp.iml" />
+      <module fileurl="file://C:\Users\hakan.karyagdi\StudioProjects\ChatApp\ChatApp.iml" filepath="C:\Users\hakan.karyagdi\StudioProjects\ChatApp\ChatApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\Users\hakan.karyagdi\StudioProjects\ChatApp\app\app.iml" filepath="C:\Users\hakan.karyagdi\StudioProjects\ChatApp\app\app.iml" />
     </modules>
   </component>
 </project>
