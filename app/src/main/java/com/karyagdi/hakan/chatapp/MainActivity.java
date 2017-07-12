@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.firebase.ui.FirebaseUI;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -84,8 +85,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 EditText txtMessage = (EditText) findViewById(R.id.txtMessage);
-                FirebaseDatabase.getInstance().getReference().push().setValue(new ChatMessage(txtMessage.getText().toString(),
-                        FirebaseAuth.getInstance().getCurrentUser().getDisplayName()));
+                Chat chat =new Chat();
+                ChatMessage chatMessage =new ChatMessage(txtMessage.getText().toString(),
+                                                        FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
+                                                        FirebaseAuth.getInstance().getCurrentUser().getUid());
+                chat.addUsers("AtUYqKbRS4NQ0SVClZvyAr2cyxX2");
+                chat.addUsers("vjvT7az7egfhBNcQkA2MRXJA4xf2");
+                chat.addMessages(chatMessage);
+
+                FirebaseDatabase.getInstance().getReference().push().setValue(chat);
                 txtMessage.getText().clear();
             }
         });

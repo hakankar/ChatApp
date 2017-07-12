@@ -7,14 +7,15 @@ import java.util.Date;
  */
 
 public class ChatMessage {
+    private String uID;
     private String messageText;
     private String messageUser;
     private long messageTime;
 
-    public ChatMessage(String messageText, String messageUser) {
+    public ChatMessage(String messageText, String messageUser, String uID) {
         this.messageText = messageText;
         this.messageUser = messageUser;
-
+        this.uID = uID;
         messageTime = new Date().getTime();
     }
 
@@ -43,5 +44,13 @@ public class ChatMessage {
 
     public void setMessageTime(long messageTime) {
         this.messageTime = messageTime;
+    }
+
+    public String getuID() {
+        return uID;
+    }
+
+    public void setuID(String uID) {
+        this.uID = uID;
     }
 }
