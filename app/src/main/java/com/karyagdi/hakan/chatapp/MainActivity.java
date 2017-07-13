@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +23,16 @@ import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseListAdapter<ChatMessage> adapter;
     RelativeLayout activity_main;
 
-
+    Chat chat;
     FloatingActionButton btnSendMessage;
 
 
@@ -76,8 +86,40 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         activity_main = (RelativeLayout)findViewById(R.id.activity_main);
+        FirebaseDatabase.getInstance().getReference().child("-Kor08MXb5BIIyMlqEmL").child("messages").addChildEventListener(new ChildEventListener() {
+            @Override
+            public int hashCode() {
+                return super.hashCode();
+            }
+
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                System.out.println("exist" + dataSnapshot.exists());
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
 
         btnSendMessage = (FloatingActionButton)findViewById(R.id.btnSendMessage);
 
@@ -85,15 +127,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 EditText txtMessage = (EditText) findViewById(R.id.txtMessage);
-                Chat chat =new Chat();
-                ChatMessage chatMessage =new ChatMessage(txtMessage.getText().toString(),
-                                                        FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
-                                                        FirebaseAuth.getInstance().getCurrentUser().getUid());
-                chat.addUsers("AtUYqKbRS4NQ0SVClZvyAr2cyxX2");
-                chat.addUsers("vjvT7az7egfhBNcQkA2MRXJA4xf2");
-                chat.addMessages(chatMessage);
 
-                FirebaseDatabase.getInstance().getReference().push().setValue(chat);
+                ChatMessage chatMessage =new ChatMessage(txtMessage.getText().toString(),
+                                                       FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
+                                                       FirebaseAuth.getInstance().getCurrentUser().getUid(),new Date().getTime());
+
+                //chat.addMessages(chatMessage);
+                //HashMap<String,Chat> chatMap =new HashMap<>();
+                //chatMap.put("-Kor08MXb5BIIyMlqEmL",chat);
+                FirebaseDatabase.getInstance().getReference().child("-Kor08MXb5BIIyMlqEmL").child("messages").push().setValue(chatMessage);
                 txtMessage.getText().clear();
             }
         });
@@ -117,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
     private void displayChatMessage() {
 
         ListView listOfMessage = (ListView)findViewById(R.id.list_of_message);
-        adapter = new FirebaseListAdapter<ChatMessage>(this,ChatMessage.class,R.layout.message_list,FirebaseDatabase.getInstance().getReference())
+        adapter = new FirebaseListAdapter<ChatMessage>(this,ChatMessage.class,R.layout.message_list,FirebaseDatabase.getInstance().getReference().child("-Kor08MXb5BIIyMlqEmL").child("messages"))
         {
             @Override
             protected void populateView(View v, ChatMessage model, int position) {

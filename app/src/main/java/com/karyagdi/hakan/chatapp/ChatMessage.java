@@ -12,11 +12,11 @@ public class ChatMessage {
     private String messageUser;
     private long messageTime;
 
-    public ChatMessage(String messageText, String messageUser, String uID) {
+    public ChatMessage(String messageText, String messageUser, String uID, Long messageTime) {
         this.messageText = messageText;
         this.messageUser = messageUser;
         this.uID = uID;
-        messageTime = new Date().getTime();
+        this.messageTime = messageTime;//new Date().getTime();
     }
 
     public ChatMessage() {

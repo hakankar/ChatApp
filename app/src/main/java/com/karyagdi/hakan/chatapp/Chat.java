@@ -20,6 +20,10 @@ public class Chat {
         return Users;
     }
 
+    public void setUsers(ArrayList<String> Users) {
+        this.Users = Users;
+    }
+
     public void addUsers(String uID) {
         Users.add(uID);
     }
@@ -29,7 +33,14 @@ public class Chat {
         return Messages;
     }
 
+    public void setMessages(ArrayList<ChatMessage> Messages) {
+        this.Messages = Messages;
+    }
+
     public void addMessages(ChatMessage message) {
         Messages.add(message);
     }
+
+
+
 }
