@@ -1,6 +1,9 @@
 package com.karyagdi.hakan.chatapp;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -11,13 +14,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.firebase.ui.FirebaseUI;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -26,24 +28,22 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.ValueEventListener;
+import com.karyagdi.hakan.chatapp.orm_objects.Chat;
+import com.karyagdi.hakan.chatapp.orm_objects.Message;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private static int SIGN_IN_REQUEST_CODE = 1;
-    private FirebaseListAdapter<ChatMessage> adapter;
+    private FirebaseListAdapter<MessageTemplate> adapter;
     RelativeLayout activity_main;
 
-    Chat chat;
     FloatingActionButton btnSendMessage;
-
-
+    Chat chat;
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.menu_sign_out)
@@ -73,7 +73,13 @@ public class MainActivity extends AppCompatActivity {
             if(resultCode == RESULT_OK)
             {
                 Snackbar.make(activity_main,"Successfully signed in.Welcome!", Snackbar.LENGTH_SHORT).show();
-                displayChatMessage();
+                if(isNetworkAvailable()) {
+                    displayChatMessage();
+                }
+                else
+                {
+                    displayOfflineChatMessage();
+                }
             }
             else{
                 Snackbar.make(activity_main,"We couldn't sign you in.Please try again later", Snackbar.LENGTH_SHORT).show();
@@ -87,6 +93,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         activity_main = (RelativeLayout)findViewById(R.id.activity_main);
+
+        if(Chat.listAll(Chat.class).size()==0)
+        {
+            chat=new Chat("-Kor08MXb5BIIyMlqEmL");
+            chat.save();
+        }
         FirebaseDatabase.getInstance().getReference().child("-Kor08MXb5BIIyMlqEmL").child("messages").addChildEventListener(new ChildEventListener() {
             @Override
             public int hashCode() {
@@ -95,8 +107,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                System.out.println("exist" + dataSnapshot.exists());
-
+               if(!chat.containsMessage(dataSnapshot.getKey()))
+               {
+                   Message message=dataSnapshot.getValue(Message.class);
+                   message.setChatId("-Kor08MXb5BIIyMlqEmL");
+                   message.setMessageId(dataSnapshot.getKey());
+                   message.save();
+               }
             }
 
             @Override
@@ -126,16 +143,23 @@ public class MainActivity extends AppCompatActivity {
         btnSendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EditText txtMessage = (EditText) findViewById(R.id.txtMessage);
 
-                ChatMessage chatMessage =new ChatMessage(txtMessage.getText().toString(),
+                EditText txtMessage = (EditText) findViewById(R.id.txtMessage);
+                MessageTemplate newMessage =new MessageTemplate(txtMessage.getText().toString(),
                                                        FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
                                                        FirebaseAuth.getInstance().getCurrentUser().getUid(),new Date().getTime());
 
                 //chat.addMessages(chatMessage);
                 //HashMap<String,Chat> chatMap =new HashMap<>();
                 //chatMap.put("-Kor08MXb5BIIyMlqEmL",chat);
-                FirebaseDatabase.getInstance().getReference().child("-Kor08MXb5BIIyMlqEmL").child("messages").push().setValue(chatMessage);
+
+
+                DatabaseReference ref=FirebaseDatabase.getInstance().getReference().child("-Kor08MXb5BIIyMlqEmL").child("messages").push();
+                ref.setValue((newMessage));
+                Message message =new Message(newMessage.getuID(),newMessage.getMessageText(),newMessage.getMessageTime());
+                message.setChatId(chat.getChatId());
+                message.setMessageId(ref.getKey());
+                message.save();
                 txtMessage.getText().clear();
             }
         });
@@ -148,7 +172,13 @@ public class MainActivity extends AppCompatActivity {
         else
         {
             //Snackbar.make(activity_main,"Welcome "+FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),Snackbar.LENGTH_SHORT).show();
-            displayChatMessage();
+            if(isNetworkAvailable()) {
+                displayChatMessage();
+            }
+            else
+            {
+                displayOfflineChatMessage();
+            }
         }
 
 
@@ -159,10 +189,10 @@ public class MainActivity extends AppCompatActivity {
     private void displayChatMessage() {
 
         ListView listOfMessage = (ListView)findViewById(R.id.list_of_message);
-        adapter = new FirebaseListAdapter<ChatMessage>(this,ChatMessage.class,R.layout.message_list,FirebaseDatabase.getInstance().getReference().child("-Kor08MXb5BIIyMlqEmL").child("messages"))
+        adapter = new FirebaseListAdapter<MessageTemplate>(this,MessageTemplate.class,R.layout.message_list,FirebaseDatabase.getInstance().getReference().child("-Kor08MXb5BIIyMlqEmL").child("messages"))
         {
             @Override
-            protected void populateView(View v, ChatMessage model, int position) {
+            protected void populateView(View v, MessageTemplate model, int position) {
 
                 TextView messageText, messageUser, messageTime;
                 messageText = (TextView) v.findViewById(R.id.message_text);
@@ -170,11 +200,27 @@ public class MainActivity extends AppCompatActivity {
                 messageTime = (TextView) v.findViewById(R.id.message_time);
 
                 messageText.setText(model.getMessageText());
-                messageUser.setText(model.getMessageUser());
+                messageUser.setText(model.getuID());
                 messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)", model.getMessageTime()));
-
             }
         };
         listOfMessage.setAdapter(adapter);
     }
+
+    private void displayOfflineChatMessage() {
+
+        MessageAdapter personAdapter = new MessageAdapter(this,R.layout.message_list,chat.getMessages());
+
+        ListView listOfMessage = (ListView)findViewById(R.id.list_of_message);
+
+        listOfMessage.setAdapter(adapter);
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
 }

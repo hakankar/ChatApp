@@ -1,14 +1,15 @@
-package com.karyagdi.hakan.chatapp;
+package com.karyagdi.hakan.chatapp.orm_objects;
+
+import com.orm.SugarRecord;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by hakan.karyagdi on 12.7.2017.
  */
 
-public class User {
-    private String uID;
+public class User extends SugarRecord<User> {
+    private String uId;
     private ArrayList<User> friends;
 
     public User()
