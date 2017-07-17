@@ -16,13 +16,11 @@ public class Message extends SugarRecord<Message> {
     private String messageText;
     private long messageTime;
 
-    public Message(String uId,String messageText,  Long messageTime) {
-        //this.messageId = messageId;
-        //this.chatId = chatId;
+
+    public Message(String uId, String messageText, Long messageTime) {
         this.messageText = messageText;
         this.uId = uId;
         this.messageTime = messageTime;//new Date().getTime();
-
     }
 
     public Message() {

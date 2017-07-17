@@ -16,14 +16,18 @@ import java.util.List;
 public class Chat extends SugarRecord<Chat>{
     private String chatId;
 
+    public Chat()
+    {
 
+
+    }
     public Chat(String chatId)
     {
         this.chatId=chatId;
 
     }
     public List<ChatUser> getUsers() {
-        return ChatUser.find(ChatUser.class,"chatId=?",this.chatId);
+        return ChatUser.find(ChatUser.class,"chat_id=?",this.chatId);
     }
 
     public void addUser(String uId) {
@@ -32,11 +36,11 @@ public class Chat extends SugarRecord<Chat>{
     }
 
     public List<Message> getMessages() {
-        return Message.find(Message.class,"chatId=?",this.chatId);
+        return Message.find(Message.class,"chat_id=?",this.chatId);
     }
 
     public Message getMessagesByKey(String messageId) {
-        List<Message> result = Message.find(Message.class,"chatId=? AND messageId=?",this.chatId,messageId);
+        List<Message> result = Message.find(Message.class,"chat_id=? AND message_id=?",this.chatId,messageId);
        if(result.size()>0)
        {
            return result.get(0);
@@ -47,7 +51,7 @@ public class Chat extends SugarRecord<Chat>{
     }
 
     public boolean containsMessage(String messageId) {
-        List<Message> result = Message.find(Message.class,"chatId=? AND messageId=?",this.chatId,messageId);
+        List<Message> result = Message.find(Message.class,"chat_id=? AND message_id=?",this.chatId,messageId);
         if(result.size()>0)
         {
             return true;
