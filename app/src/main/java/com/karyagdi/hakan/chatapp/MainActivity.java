@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 //{
                 //   displayOfflineChatMessage();
                 //}
+
             }
             else{
                 Snackbar.make(activity_main,"We couldn't sign you in.Please try again later", Snackbar.LENGTH_SHORT).show();
@@ -107,9 +108,9 @@ public class MainActivity extends AppCompatActivity {
                if(!chat.containsMessage(dataSnapshot.getKey()))
                {
                 Message newMessage = dataSnapshot.getValue(Message.class);
-                  message= new Message(newMessage.getuID(),newMessage.getMessageText(),newMessage.getMessageTime());
-                  message.setChatId("-Kor08MXb5BIIyMlqEmL");
-                  message.setMessageId(dataSnapshot.getKey());
+                  message= new Message(newMessage.getsender(),newMessage.getmessage(),newMessage.getdate());
+                  message.setchat("-Kor08MXb5BIIyMlqEmL");
+                  message.setid(dataSnapshot.getKey());
                   message.save();
                   Log.v("Mesaj alındı",String.valueOf(Message.listAll(Message.class).size()));
                }
@@ -162,8 +163,8 @@ public class MainActivity extends AppCompatActivity {
                 DatabaseReference ref=FirebaseDatabase.getInstance().getReference().child("-Kor08MXb5BIIyMlqEmL").child("messages").push();
                 ref.setValue((newMessage));
                 message =new Message(newMessage.getuID(),newMessage.getMessageText(),newMessage.getMessageTime());
-                message.setChatId(chat.getChatId());
-                message.setMessageId(ref.getKey());
+                message.setchat(chat.getid());
+                message.setid(ref.getKey());
                 message.save();
                 txtMessage.getText().clear();
             }

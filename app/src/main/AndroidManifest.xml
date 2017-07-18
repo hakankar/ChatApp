@@ -12,7 +12,7 @@
         android:name="com.orm.SugarApp">
 
         <meta-data android:name="DATABASE" android:value="chatApp_sugar.db" />
-        <meta-data android:name="VERSION" android:value="8" />
+        <meta-data android:name="VERSION" android:value="10" />
         <meta-data android:name="QUERY_LOG" android:value="true" />
         <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="com.karyagdi.hakan.chatapp" />
 

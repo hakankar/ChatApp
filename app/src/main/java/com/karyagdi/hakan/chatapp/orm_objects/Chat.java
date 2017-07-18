@@ -1,5 +1,7 @@
 package com.karyagdi.hakan.chatapp.orm_objects;
 
+import android.util.Log;
+
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
@@ -14,33 +16,34 @@ import java.util.List;
  */
 
 public class Chat extends SugarRecord<Chat>{
-    private String chatId;
+    private String id;
 
     public Chat()
     {
 
 
     }
-    public Chat(String chatId)
+    public Chat(String id)
     {
-        this.chatId=chatId;
+        Log.v("chatid: ",this.id);
+        this.id=id;
 
     }
     public List<ChatUser> getUsers() {
-        return ChatUser.find(ChatUser.class,"chat_id=?",this.chatId);
+        return ChatUser.find(ChatUser.class,"chat=?",this.id);
     }
 
     public void addUser(String uId) {
-        ChatUser chatUser=new ChatUser(this.chatId,uId);
+        ChatUser chatUser=new ChatUser(this.id,uId);
         chatUser.save();
     }
 
     public List<Message> getMessages() {
-        return Message.find(Message.class,"chat_id=?",this.chatId);
+        return Message.find(Message.class,"chat=?",this.id);
     }
 
     public Message getMessagesByKey(String messageId) {
-        List<Message> result = Message.find(Message.class,"chat_id=? AND message_id=?",this.chatId,messageId);
+        List<Message> result = Message.find(Message.class,"chat=? AND id=?",this.id,messageId);
        if(result.size()>0)
        {
            return result.get(0);
@@ -51,7 +54,8 @@ public class Chat extends SugarRecord<Chat>{
     }
 
     public boolean containsMessage(String messageId) {
-        List<Message> result = Message.find(Message.class,"chat_id=? AND message_id=?",this.chatId,messageId);
+        Log.v("degerler: ",messageId + " -- " +this.id);
+        List<Message> result = Message.find(Message.class,"chat=? AND id=?",this.id,messageId);
         if(result.size()>0)
         {
             return true;
@@ -62,11 +66,11 @@ public class Chat extends SugarRecord<Chat>{
     }
 
 
-    public String getChatId() {
-        return chatId;
+    public String getid() {
+        return id;
     }
 
-    public void setChatId(String chatId) {
-        this.chatId = chatId;
+    public void setid(String id) {
+        this.id = id;
     }
 }

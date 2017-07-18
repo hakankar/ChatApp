@@ -9,7 +9,7 @@ import java.util.ArrayList;
  */
 
 public class User extends SugarRecord<User> {
-    private String uId;
+    private String id;
     private ArrayList<User> friends;
 
     public User()

@@ -7,27 +7,27 @@ import com.orm.SugarRecord;
  */
 
 public class ChatUser extends SugarRecord<ChatUser> {
-    private String chatId;
-    private String uId;
+    private String chat;
+    private String user;
 
-    public ChatUser (String chatId, String uId)
+    public ChatUser (String chat, String user)
     {
-        this.chatId=chatId;
-        this.uId=uId;
+        this.chat=chat;
+        this.user=user;
     }
-    public String getChatId() {
-        return chatId;
-    }
-
-    public void setChatId(String chatId) {
-        this.chatId = chatId;
+    public String getchat() {
+        return chat;
     }
 
-    public String getuId() {
-        return uId;
+    public void setchat(String chat) {
+        this.chat = chat;
     }
 
-    public void setuId(String uId) {
-        this.uId = uId;
+    public String getuser() {
+        return user;
+    }
+
+    public void setuser(String user) {
+        this.user = user;
     }
 }

@@ -40,9 +40,9 @@ public class MessageAdapter extends ArrayAdapter {
             messageUser = (TextView) v.findViewById(R.id.message_user);
             messageTime = (TextView) v.findViewById(R.id.message_time);
 
-            messageText.setText(model.getMessageText());
-            messageUser.setText(model.getuID());
-            messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)", model.getMessageTime()));
+            messageText.setText(model.getmessage());
+            messageUser.setText(model.getsender());
+            messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)", model.getdate()));
 
         }
         return v;
