@@ -1,18 +1,24 @@
 package com.karyagdi.hakan.chatapp.orm_objects;
 
 
-import com.orm.SugarRecord;
+import com.j256.ormlite.field.DatabaseField;
 
+import java.io.Serializable;
 
 /**
  * Created by hakan on 7/9/17.
  */
 
-public class Message extends SugarRecord<Message> {
+public class Message implements Serializable {
+    @DatabaseField(columnName = "ID",id=true)
     private String id;
+    @DatabaseField(columnName = "CHAT_ID")
     private String chat;
+    @DatabaseField(columnName = "SENDER_ID")
     private String sender;
+    @DatabaseField(columnName = "MESSAGE")
     private String message;
+    @DatabaseField(columnName = "DATE")
     private long date;
 
 

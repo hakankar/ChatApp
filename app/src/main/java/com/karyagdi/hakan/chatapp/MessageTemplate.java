@@ -2,7 +2,7 @@ package com.karyagdi.hakan.chatapp;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
-import com.orm.SugarRecord;
+
 
 import java.util.Date;
 
@@ -11,42 +11,42 @@ import java.util.Date;
  */
 @IgnoreExtraProperties
 public class MessageTemplate {
-    private String uId;
-    private String messageText;
-    private long messageTime;
+    private String sender;
+    private String message;
+    private long date;
 
-    public MessageTemplate(String messageText, String messageUser, String uId, Long messageTime) {
-        this.messageText = messageText;
-        this.uId = uId;
-        this.messageTime = messageTime;//new Date().getTime();
+    public MessageTemplate(String message, String messageUser, String sender, Long date) {
+        this.message = message;
+        this.sender = sender;
+        this.date = date;//new Date().getTime();
     }
 
     public MessageTemplate() {
     }
 
-    public String getMessageText() {
-        return messageText;
+    public String getmessage() {
+        return message;
     }
 
-    public void setMessageText(String messageText) {
-        this.messageText = messageText;
+    public void setmessage(String message) {
+        this.message = message;
     }
 
 
 
-    public long getMessageTime() {
-        return messageTime;
+    public long getdate() {
+        return date;
     }
 
-    public void setMessageTime(long messageTime) {
-        this.messageTime = messageTime;
+    public void setdate(long date) {
+        this.date = date;
     }
 
-    public String getuID() {
-        return uId;
+    public String getsender() {
+        return sender;
     }
 
-    public void setuID(String uID) {
-        this.uId = uId;
+    public void setsender(String sender) {
+        this.sender = sender;
     }
 }

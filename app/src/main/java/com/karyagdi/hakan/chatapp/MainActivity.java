@@ -30,21 +30,27 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.j256.ormlite.dao.Dao;
+import com.karyagdi.hakan.chatapp.Utility.BaseActivity;
 import com.karyagdi.hakan.chatapp.orm_objects.Chat;
+import com.karyagdi.hakan.chatapp.orm_objects.DatabaseHelper;
 import com.karyagdi.hakan.chatapp.orm_objects.Message;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private static int SIGN_IN_REQUEST_CODE = 1;
     private FirebaseListAdapter<MessageTemplate> adapter;
     RelativeLayout activity_main;
 
     FloatingActionButton btnSendMessage;
-    Chat chat = new Chat();
-    Message message = new Message();
+    DatabaseHelper DatabaseHelper;
+    String chatId;
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.menu_sign_out)
@@ -75,11 +81,12 @@ public class MainActivity extends AppCompatActivity {
             {
                 Snackbar.make(activity_main,"Successfully signed in.Welcome!", Snackbar.LENGTH_SHORT).show();
                 // if(isNetworkAvailable()) {
-                displayChatMessage();
+                //displayChatMessage();
+                //displayOfflineChatMessage();
                 //}
                 //else
                 //{
-                //   displayOfflineChatMessage();
+                displayOfflineChatMessage();
                 //}
 
             }
@@ -93,11 +100,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        DatabaseHelper=new DatabaseHelper(getApplicationContext());
         setContentView(R.layout.activity_main);
         activity_main = (RelativeLayout)findViewById(R.id.activity_main);
+        chatId="-Kor08MXb5BIIyMlqEmL";
+        try {
+            getmChat(DatabaseHelper).createIfNotExists(new Chat(chatId));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-
-        FirebaseDatabase.getInstance().getReference().child("-Kor08MXb5BIIyMlqEmL").child("messages").addChildEventListener(new ChildEventListener() {
+        FirebaseDatabase.getInstance().getReference().child(chatId).child("messages").addChildEventListener(new ChildEventListener() {
             @Override
             public int hashCode() {
                 return super.hashCode();
@@ -105,15 +118,17 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-               if(!chat.containsMessage(dataSnapshot.getKey()))
-               {
-                Message newMessage = dataSnapshot.getValue(Message.class);
-                  message= new Message(newMessage.getsender(),newMessage.getmessage(),newMessage.getdate());
-                  message.setchat("-Kor08MXb5BIIyMlqEmL");
+                try {
+                  MessageTemplate newMessage = dataSnapshot.getValue(MessageTemplate.class);
+                  Message message = new Message(newMessage.getsender(),newMessage.getmessage(),newMessage.getdate());
+                  message.setchat(chatId);
                   message.setid(dataSnapshot.getKey());
-                  message.save();
-                  Log.v("Mesaj alındı",String.valueOf(Message.listAll(Message.class).size()));
-               }
+                  getmMessage(DatabaseHelper).createIfNotExists(message);
+                    displayOfflineChatMessage();
+                }
+               catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -145,28 +160,26 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 EditText txtMessage = (EditText) findViewById(R.id.txtMessage);
-                if (chat==null)
-                {
-                    DatabaseReference refChat =FirebaseDatabase.getInstance().getReference().push();
-                    chat=new Chat(refChat.getKey());
-                    chat.save();
-                }
+
                 MessageTemplate newMessage =new MessageTemplate(txtMessage.getText().toString(),
                                                        FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
                                                        FirebaseAuth.getInstance().getCurrentUser().getUid(),new Date().getTime());
 
-                //chat.addMessages(chatMessage);
-                //HashMap<String,Chat> chatMap =new HashMap<>();
-                //chatMap.put("-Kor08MXb5BIIyMlqEmL",chat);
 
 
-                DatabaseReference ref=FirebaseDatabase.getInstance().getReference().child("-Kor08MXb5BIIyMlqEmL").child("messages").push();
-                ref.setValue((newMessage));
-                message =new Message(newMessage.getuID(),newMessage.getMessageText(),newMessage.getMessageTime());
-                message.setchat(chat.getid());
-                message.setid(ref.getKey());
-                message.save();
-                txtMessage.getText().clear();
+                try {
+                    DatabaseReference ref=FirebaseDatabase.getInstance().getReference().child(chatId).child("messages").push();
+                    ref.setValue((newMessage));
+                    Message message =new Message(newMessage.getsender(),newMessage.getmessage(),newMessage.getdate());
+                    message.setchat(chatId);
+                    message.setid(ref.getKey());
+                    getmMessage(DatabaseHelper).create(message);
+                    displayOfflineChatMessage();
+                    txtMessage.getText().clear();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
             }
         });
 
@@ -179,7 +192,8 @@ public class MainActivity extends AppCompatActivity {
         {
             //Snackbar.make(activity_main,"Welcome "+FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),Snackbar.LENGTH_SHORT).show();
            // if(isNetworkAvailable()) {
-                displayChatMessage();
+               // displayChatMessage();
+            displayOfflineChatMessage();
             //}
             //else
             //{
@@ -195,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
     private void displayChatMessage() {
 
         ListView listOfMessage = (ListView)findViewById(R.id.list_of_message);
-        adapter = new FirebaseListAdapter<MessageTemplate>(this,MessageTemplate.class,R.layout.message_list,FirebaseDatabase.getInstance().getReference().child("-Kor08MXb5BIIyMlqEmL").child("messages"))
+        adapter = new FirebaseListAdapter<MessageTemplate>(this,MessageTemplate.class,R.layout.message_list,FirebaseDatabase.getInstance().getReference().child(chatId).child("messages"))
         {
             @Override
             protected void populateView(View v, MessageTemplate model, int position) {
@@ -205,21 +219,31 @@ public class MainActivity extends AppCompatActivity {
                 messageUser = (TextView) v.findViewById(R.id.message_user);
                 messageTime = (TextView) v.findViewById(R.id.message_time);
 
-                messageText.setText(model.getMessageText());
-                messageUser.setText(model.getuID());
-                messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)", model.getMessageTime()));
+                messageText.setText(model.getmessage());
+                messageUser.setText(model.getsender());
+                messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)", model.getdate()));
             }
         };
         listOfMessage.setAdapter(adapter);
     }
 
     private void displayOfflineChatMessage() {
+        List<Message> messages=new ArrayList<Message>();
+        try {
+            messages = getmMessage(DatabaseHelper).query(
+                    getmMessage(DatabaseHelper).queryBuilder().where()
+                            .eq("CHAT_ID",chatId)
+                            .prepare());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-        MessageAdapter messageAdapter = new MessageAdapter(this,R.layout.message_list,chat.getMessages());
+        MessageAdapter messageAdapter = new MessageAdapter(this, R.layout.message_list, messages);
 
-        ListView listOfMessage = (ListView)findViewById(R.id.list_of_message);
+        ListView listOfMessage = (ListView) findViewById(R.id.list_of_message);
 
         listOfMessage.setAdapter(messageAdapter);
+
     }
 
     private boolean isNetworkAvailable() {

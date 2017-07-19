@@ -1,22 +1,26 @@
 package com.karyagdi.hakan.chatapp.orm_objects;
 
-import com.orm.SugarRecord;
 
+import com.j256.ormlite.field.DatabaseField;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by hakan.karyagdi on 12.7.2017.
  */
 
-public class User extends SugarRecord<User> {
+public class User  implements Serializable {
+    @DatabaseField(columnName = "USER_ID")
     private String id;
-    private ArrayList<User> friends;
+    @DatabaseField(columnName = "FRIEND_ID")
+    private String friend;
 
     public User()
     {
-        friends=new ArrayList<User>();
+
     }
-    public ArrayList<User> getFriends(int index) {
+    /*public ArrayList<User> getFriends(int index) {
         return friends;
     }
 
@@ -26,5 +30,5 @@ public class User extends SugarRecord<User> {
 
     public void addFriend(User friend) {
         this.friends.add(friend);
-    }
+    }*/
 }

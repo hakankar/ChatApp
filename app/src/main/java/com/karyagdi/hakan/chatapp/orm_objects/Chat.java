@@ -2,8 +2,8 @@ package com.karyagdi.hakan.chatapp.orm_objects;
 
 import android.util.Log;
 
-import com.orm.SugarRecord;
-import com.orm.dsl.Ignore;
+import com.google.gson.annotations.SerializedName;
+import com.j256.ormlite.field.DatabaseField;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -15,7 +15,8 @@ import java.util.List;
  * Created by hakan.karyagdi on 12.7.2017.
  */
 
-public class Chat extends SugarRecord<Chat>{
+public class Chat implements Serializable {
+    @DatabaseField(columnName = "ID",id=true)
     private String id;
 
     public Chat()
@@ -25,11 +26,10 @@ public class Chat extends SugarRecord<Chat>{
     }
     public Chat(String id)
     {
-        Log.v("chatid: ",this.id);
         this.id=id;
 
     }
-    public List<ChatUser> getUsers() {
+    /*public List<ChatUser> getUsers() {
         return ChatUser.find(ChatUser.class,"chat=?",this.id);
     }
 
@@ -72,5 +72,5 @@ public class Chat extends SugarRecord<Chat>{
 
     public void setid(String id) {
         this.id = id;
-    }
+    }*/
 }
