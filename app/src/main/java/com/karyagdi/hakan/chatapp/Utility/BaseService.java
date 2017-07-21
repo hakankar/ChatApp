@@ -1,29 +1,43 @@
 package com.karyagdi.hakan.chatapp.Utility;
 
-import android.os.Bundle;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 import com.j256.ormlite.dao.Dao;
 import com.karyagdi.hakan.chatapp.orm_objects.Chat;
-import com.karyagdi.hakan.chatapp.orm_objects.Message;
 import com.karyagdi.hakan.chatapp.orm_objects.ChatUser;
-import com.karyagdi.hakan.chatapp.orm_objects.User;
 import com.karyagdi.hakan.chatapp.orm_objects.DatabaseHelper;
+import com.karyagdi.hakan.chatapp.orm_objects.Message;
+import com.karyagdi.hakan.chatapp.orm_objects.User;
 
 import java.sql.SQLException;
 
 /**
- * Created by hakan.karyagdi on 19.7.2017.
+ * Created by hakan.karyagdi on 20.7.2017.
  */
 
-public class BaseActivity extends AppCompatActivity {
-    private DatabaseHelper DatabaseHelper;
+public class BaseService extends Service {
+    private Context context;
+    private com.karyagdi.hakan.chatapp.orm_objects.DatabaseHelper DatabaseHelper;
     private Dao<Chat,Integer> mChat;
     private Dao<ChatUser,Integer> mChatUser;
     private Dao<Message,Integer> mMessage;
     private Dao<User,Integer> mUser;
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+    }
 
     public DatabaseHelper getDatabaseHelper() {
         if(DatabaseHelper==null)
@@ -78,4 +92,5 @@ public class BaseActivity extends AppCompatActivity {
         }
         return mUser;
     }
+
 }

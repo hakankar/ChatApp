@@ -30,11 +30,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.gson.Gson;
 import com.j256.ormlite.dao.Dao;
 import com.karyagdi.hakan.chatapp.Utility.BaseActivity;
 import com.karyagdi.hakan.chatapp.orm_objects.Chat;
 import com.karyagdi.hakan.chatapp.orm_objects.DatabaseHelper;
 import com.karyagdi.hakan.chatapp.orm_objects.Message;
+import com.karyagdi.hakan.chatapp.services.MessageService;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -50,6 +52,7 @@ public class MainActivity extends BaseActivity {
     FloatingActionButton btnSendMessage;
     DatabaseHelper DatabaseHelper;
     String chatId;
+    Intent messageService;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -100,17 +103,19 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        messageService =new Intent(this,MessageService.class);
         DatabaseHelper=new DatabaseHelper(getApplicationContext());
         setContentView(R.layout.activity_main);
         activity_main = (RelativeLayout)findViewById(R.id.activity_main);
         chatId="-Kor08MXb5BIIyMlqEmL";
         try {
-            getmChat(DatabaseHelper).createIfNotExists(new Chat(chatId));
+            getmChat().createIfNotExists(new Chat(chatId));
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        FirebaseDatabase.getInstance().getReference().child(chatId).child("messages").addChildEventListener(new ChildEventListener() {
+        FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("messages").addChildEventListener(new ChildEventListener() {
             @Override
             public int hashCode() {
                 return super.hashCode();
@@ -123,7 +128,7 @@ public class MainActivity extends BaseActivity {
                   Message message = new Message(newMessage.getsender(),newMessage.getmessage(),newMessage.getdate());
                   message.setchat(chatId);
                   message.setid(dataSnapshot.getKey());
-                  getmMessage(DatabaseHelper).createIfNotExists(message);
+                  getmMessage().createIfNotExists(message);
                     displayOfflineChatMessage();
                 }
                catch (SQLException e) {
@@ -165,15 +170,13 @@ public class MainActivity extends BaseActivity {
                                                        FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
                                                        FirebaseAuth.getInstance().getCurrentUser().getUid(),new Date().getTime());
 
-
-
                 try {
-                    DatabaseReference ref=FirebaseDatabase.getInstance().getReference().child(chatId).child("messages").push();
+                    DatabaseReference ref=FirebaseDatabase.getInstance().getReference("chats").child(chatId).child("messages").push();
                     ref.setValue((newMessage));
                     Message message =new Message(newMessage.getsender(),newMessage.getmessage(),newMessage.getdate());
                     message.setchat(chatId);
                     message.setid(ref.getKey());
-                    getmMessage(DatabaseHelper).create(message);
+                    getmMessage().create(message);
                     displayOfflineChatMessage();
                     txtMessage.getText().clear();
                 } catch (SQLException e) {
@@ -187,6 +190,9 @@ public class MainActivity extends BaseActivity {
         if(FirebaseAuth.getInstance().getCurrentUser() == null)
         {
             startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder().build(),SIGN_IN_REQUEST_CODE);
+            stopService(messageService);
+            // messageService.putExtra("CurrentUser", new Gson().toJson(FirebaseAuth.getInstance().getCurrentUser()));
+            startService(messageService);
         }
         else
         {
@@ -209,7 +215,7 @@ public class MainActivity extends BaseActivity {
     private void displayChatMessage() {
 
         ListView listOfMessage = (ListView)findViewById(R.id.list_of_message);
-        adapter = new FirebaseListAdapter<MessageTemplate>(this,MessageTemplate.class,R.layout.message_list,FirebaseDatabase.getInstance().getReference().child(chatId).child("messages"))
+        adapter = new FirebaseListAdapter<MessageTemplate>(this,MessageTemplate.class,R.layout.message_list,FirebaseDatabase.getInstance().getReference("chats").child(chatId).child("messages"))
         {
             @Override
             protected void populateView(View v, MessageTemplate model, int position) {
@@ -230,8 +236,8 @@ public class MainActivity extends BaseActivity {
     private void displayOfflineChatMessage() {
         List<Message> messages=new ArrayList<Message>();
         try {
-            messages = getmMessage(DatabaseHelper).query(
-                    getmMessage(DatabaseHelper).queryBuilder().where()
+            messages = getmMessage().query(
+                    getmMessage().queryBuilder().where()
                             .eq("CHAT_ID",chatId)
                             .prepare());
         } catch (SQLException e) {
