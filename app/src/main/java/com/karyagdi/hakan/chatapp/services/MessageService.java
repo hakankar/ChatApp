@@ -13,7 +13,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.karyagdi.hakan.chatapp.MessageTemplate;
@@ -41,9 +43,9 @@ public class MessageService extends BaseService {
         mFirebaseAuth = FirebaseAuth.getInstance();
         //        DatabaseHelper=new DatabaseHelper(getApplicationContext());
         Log.v("Service message: ","Running");
-        String userId ="AtUYqKbRS4NQ0SVClZvyAr2cyxX2";
-
-        mFirebaseDatabase.getReference().child("chats").orderByChild("users/user").equalTo(userId).addChildEventListener(new ChildEventListener() {
+        String userId ="vjvT7az7egfhBNcQkA2MRXJA4xf2";
+        Query referance = mFirebaseDatabase.getReference().child("chats").orderByChild("users/vjvT7az7egfhBNcQkA2MRXJA4xf2").equalTo(true);
+        referance.addChildEventListener(new ChildEventListener() {
             @Override
             public int hashCode() {
                 return super.hashCode();
@@ -58,7 +60,8 @@ public class MessageService extends BaseService {
                     message.setchat(chatId);
                     message.setid(dataSnapshot.getKey());
                     getmMessage().createIfNotExists(message);*/
-                Log.v("Değişim ID: ",dataSnapshot.getKey());
+                    System.out.println("Added" + dataSnapshot.getValue());
+
 //                }
                 /*catch (SQLException e) {
                     e.printStackTrace();
@@ -67,7 +70,7 @@ public class MessageService extends BaseService {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+                System.out.println("changed" + dataSnapshot.getValue());
             }
 
             @Override
@@ -85,6 +88,7 @@ public class MessageService extends BaseService {
                 Log.v("HATA:  ",databaseError.getMessage());
             }
         });
+
     }
 
     @Override

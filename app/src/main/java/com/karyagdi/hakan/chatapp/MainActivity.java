@@ -32,14 +32,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.dao.RawRowMapper;
 import com.karyagdi.hakan.chatapp.Utility.BaseActivity;
 import com.karyagdi.hakan.chatapp.orm_objects.Chat;
+import com.karyagdi.hakan.chatapp.orm_objects.ChatUser;
 import com.karyagdi.hakan.chatapp.orm_objects.DatabaseHelper;
 import com.karyagdi.hakan.chatapp.orm_objects.Message;
 import com.karyagdi.hakan.chatapp.services.MessageService;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -109,8 +112,13 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         activity_main = (RelativeLayout)findViewById(R.id.activity_main);
         chatId="-Kor08MXb5BIIyMlqEmL";
+        String user1="AtUYqKbRS4NQ0SVClZvyAr2cyxX2";
+        String user2="vjvT7az7egfhBNcQkA2MRXJA4xf2";
         try {
+
             getmChat().createIfNotExists(new Chat(chatId));
+//            getmChatUser().create(new ChatUser(chatId,user1));
+//            getmChatUser().create(new ChatUser(chatId,user2));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -166,13 +174,24 @@ public class MainActivity extends BaseActivity {
 
                 EditText txtMessage = (EditText) findViewById(R.id.txtMessage);
 
-                MessageTemplate newMessage =new MessageTemplate(txtMessage.getText().toString(),
-                                                       FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
-                                                       FirebaseAuth.getInstance().getCurrentUser().getUid(),new Date().getTime());
-
                 try {
+
+
+                    List<String> list = getmChatUser().queryRaw("select USER_ID from ChatUser where CHAT_ID='"+chatId+"'", new RawRowMapper<String>() {
+                        @Override
+                        public String mapRow(String[] columnNames, String[] resultColumns) throws SQLException {
+                            return resultColumns[0];
+                        }
+                    }).getResults();
+
+                    ArrayList<String> authors = new ArrayList<String>(list);
+                    MessageTemplate newMessage =new MessageTemplate(txtMessage.getText().toString(),
+                            FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
+                            FirebaseAuth.getInstance().getCurrentUser().getUid(),new Date().getTime());
+
                     DatabaseReference ref=FirebaseDatabase.getInstance().getReference("chats").child(chatId).child("messages").push();
                     ref.setValue((newMessage));
+                    ref.child("authors").setValue(authors);
                     Message message =new Message(newMessage.getsender(),newMessage.getmessage(),newMessage.getdate());
                     message.setchat(chatId);
                     message.setid(ref.getKey());

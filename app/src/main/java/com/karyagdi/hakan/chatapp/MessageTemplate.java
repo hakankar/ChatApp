@@ -4,12 +4,13 @@ import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
  * Created by hakan on 7/9/17.
  */
-@IgnoreExtraProperties
+
 public class MessageTemplate {
     private String sender;
     private String message;
@@ -49,4 +50,6 @@ public class MessageTemplate {
     public void setsender(String sender) {
         this.sender = sender;
     }
+
+
 }
