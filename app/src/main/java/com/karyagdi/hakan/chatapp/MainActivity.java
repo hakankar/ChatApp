@@ -117,53 +117,11 @@ public class MainActivity extends BaseActivity {
         try {
 
             getmChat().createIfNotExists(new Chat(chatId));
-//            getmChatUser().create(new ChatUser(chatId,user1));
-//            getmChatUser().create(new ChatUser(chatId,user2));
+            getmChatUser().create(new ChatUser(chatId,user1));
+            getmChatUser().create(new ChatUser(chatId,user2));
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("messages").addChildEventListener(new ChildEventListener() {
-            @Override
-            public int hashCode() {
-                return super.hashCode();
-            }
-
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                try {
-                  MessageTemplate newMessage = dataSnapshot.getValue(MessageTemplate.class);
-                  Message message = new Message(newMessage.getsender(),newMessage.getmessage(),newMessage.getdate());
-                  message.setchat(chatId);
-                  message.setid(dataSnapshot.getKey());
-                  getmMessage().createIfNotExists(message);
-                    displayOfflineChatMessage();
-                }
-               catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
 
         btnSendMessage = (FloatingActionButton)findViewById(R.id.btnSendMessage);
@@ -185,17 +143,18 @@ public class MainActivity extends BaseActivity {
                     }).getResults();
 
                     ArrayList<String> authors = new ArrayList<String>(list);
-                    MessageTemplate newMessage =new MessageTemplate(txtMessage.getText().toString(),
-                            FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
-                            FirebaseAuth.getInstance().getCurrentUser().getUid(),new Date().getTime());
+                    Message newMessage =new Message(FirebaseAuth.getInstance().getCurrentUser().getUid(),txtMessage.getText().toString(),new Date().getTime(),chatId);
 
-                    DatabaseReference ref=FirebaseDatabase.getInstance().getReference("chats").child(chatId).child("messages").push();
+                    DatabaseReference ref=FirebaseDatabase.getInstance().getReference("messages").push();
                     ref.setValue((newMessage));
-                    ref.child("authors").setValue(authors);
-                    Message message =new Message(newMessage.getsender(),newMessage.getmessage(),newMessage.getdate());
-                    message.setchat(chatId);
-                    message.setid(ref.getKey());
-                    getmMessage().create(message);
+                    for (String user : authors) {
+                        ref.child("authors").child(user).setValue(true);
+                    }
+
+                    System.out.println("authors " + authors);
+                   //Message message =new Message(newMessage.getsender(),newMessage.getmessage(),newMessage.getdate());
+                    newMessage.setid(ref.getKey());
+                    getmMessage().create(newMessage);
                     displayOfflineChatMessage();
                     txtMessage.getText().clear();
                 } catch (SQLException e) {

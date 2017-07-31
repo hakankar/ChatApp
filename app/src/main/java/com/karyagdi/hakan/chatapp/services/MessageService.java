@@ -43,8 +43,8 @@ public class MessageService extends BaseService {
         mFirebaseAuth = FirebaseAuth.getInstance();
         //        DatabaseHelper=new DatabaseHelper(getApplicationContext());
         Log.v("Service message: ","Running");
-        String userId ="vjvT7az7egfhBNcQkA2MRXJA4xf2";
-        Query referance = mFirebaseDatabase.getReference().child("chats").orderByChild("users/vjvT7az7egfhBNcQkA2MRXJA4xf2").equalTo(true);
+        String userId ="AtUYqKbRS4NQ0SVClZvyAr2cyxX2";
+        Query referance = mFirebaseDatabase.getReference("messages").orderByChild("authors/"+userId).equalTo(true);
         referance.addChildEventListener(new ChildEventListener() {
             @Override
             public int hashCode() {
@@ -53,19 +53,19 @@ public class MessageService extends BaseService {
 
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                try {
+                try {
 
-                    /*MessageTemplate newMessage = dataSnapshot.getValue(MessageTemplate.class);
-                    Message message = new Message(newMessage.getsender(),newMessage.getmessage(),newMessage.getdate());
-                    message.setchat(chatId);
+                    Message message = new Message(dataSnapshot.child("sender").getValue().toString(),
+                            dataSnapshot.child("message").getValue().toString(),
+                            Long.valueOf(dataSnapshot.child("date").getValue().toString()),dataSnapshot.child("chat").getValue().toString());
                     message.setid(dataSnapshot.getKey());
-                    getmMessage().createIfNotExists(message);*/
+                    getmMessage().createIfNotExists(message);
                     System.out.println("Added" + dataSnapshot.getValue());
 
-//                }
-                /*catch (SQLException e) {
+                }
+                catch (SQLException e) {
                     e.printStackTrace();
-                }*/
+                }
             }
 
             @Override

@@ -18,16 +18,33 @@ import java.util.List;
 public class Chat implements Serializable {
     @DatabaseField(columnName = "ID",id=true)
     private String id;
+    @DatabaseField(columnName = "Type")
+    private String type;
 
     public Chat()
     {
-
 
     }
     public Chat(String id)
     {
         this.id=id;
 
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
     /*public List<ChatUser> getUsers() {
         return ChatUser.find(ChatUser.class,"chat=?",this.id);

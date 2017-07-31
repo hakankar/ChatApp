@@ -22,10 +22,11 @@ public class Message implements Serializable {
     private long date;
 
 
-    public Message(String sender, String message, Long date) {
+    public Message(String sender, String message, Long date,String chat) {
         this.message = message;
         this.sender = sender;
         this.date = date;//new Date().getTime();
+        this.chat=chat;
     }
 
     public Message() {
