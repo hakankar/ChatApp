@@ -11,14 +11,19 @@ import java.util.ArrayList;
  */
 
 public class User  implements Serializable {
-    @DatabaseField(columnName = "USER_ID")
+    @DatabaseField(columnName = "USER_ID",id=true)
     private String id;
-    @DatabaseField(columnName = "FRIEND_ID")
-    private String friend;
+    @DatabaseField(columnName = "DISPLAY_NAME")
+    private String displayName;
 
     public User()
     {
 
+    }
+    public User(String id, String displayName)
+    {
+        this.id = id;
+        this.displayName = displayName;
     }
     /*public ArrayList<User> getFriends(int index) {
         return friends;

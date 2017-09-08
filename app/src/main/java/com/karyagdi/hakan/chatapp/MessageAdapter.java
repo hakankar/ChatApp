@@ -19,7 +19,7 @@ import java.util.List;
  */
 
 public class MessageAdapter extends ArrayAdapter {
-    public MessageAdapter(@NonNull Context context, int resource, @NonNull List<Message> messages) {
+    public MessageAdapter(@NonNull Context context, int resource, @NonNull List<MessageTemplate> messages) {
         super(context, resource, messages);
     }
 
@@ -32,7 +32,7 @@ public class MessageAdapter extends ArrayAdapter {
             vi = LayoutInflater.from(getContext());
             v = vi.inflate(R.layout.message_list, null);
         }
-        Message model = (Message) getItem(position);
+        MessageTemplate model = (MessageTemplate) getItem(position);
         if (model != null) {
 
             TextView messageText, messageUser, messageTime;

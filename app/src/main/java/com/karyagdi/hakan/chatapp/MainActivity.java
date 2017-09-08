@@ -2,6 +2,7 @@ package com.karyagdi.hakan.chatapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
@@ -212,15 +213,34 @@ public class MainActivity extends BaseActivity {
     }
 
     private void displayOfflineChatMessage() {
-        List<Message> messages=new ArrayList<Message>();
-        try {
-            messages = getmMessage().query(
-                    getmMessage().queryBuilder().where()
-                            .eq("CHAT_ID",chatId)
-                            .prepare());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+       // List<Message> messages=new ArrayList<Message>();
+        List<MessageTemplate> messages=new ArrayList<MessageTemplate>();
+
+//        try {
+//            messages = getmMessage().query(
+//                    getmMessage().queryBuilder().where()
+//                            .eq("CHAT_ID",chatId)
+//                            .prepare());
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+
+
+           Cursor cursor = getDatabaseHelper().getReadableDatabase().rawQuery(
+                   "SELECT M.MESSAGE, M.DATE, U.DISPLAY_NAME " +
+                           "FROM MESSAGE M " +
+                           "INNER JOIN USER U ON M.SENDER_ID = U.USER_ID " +
+                           "WHERE M.CHAT_ID ='"+chatId+"'",null);
+           for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext())
+            {
+                messages.add(new MessageTemplate(
+                        cursor.getString(cursor.getColumnIndex("MESSAGE")),
+                        cursor.getString(cursor.getColumnIndex("DISPLAY_NAME")),
+                        Long.valueOf(cursor.getString(cursor.getColumnIndex("DATE")))
+                        ));
+                Log.v("MESSAGE:   ",cursor.getString(cursor.getColumnIndex("MESSAGE")));
+            }
+
 
         MessageAdapter messageAdapter = new MessageAdapter(this, R.layout.message_list, messages);
 

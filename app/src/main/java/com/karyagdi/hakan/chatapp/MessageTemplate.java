@@ -16,7 +16,7 @@ public class MessageTemplate {
     private String message;
     private long date;
 
-    public MessageTemplate(String message, String messageUser, String sender, Long date) {
+    public MessageTemplate(String message, String sender, Long date) {
         this.message = message;
         this.sender = sender;
         this.date = date;//new Date().getTime();
