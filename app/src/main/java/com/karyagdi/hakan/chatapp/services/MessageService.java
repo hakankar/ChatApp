@@ -1,12 +1,15 @@
 package com.karyagdi.hakan.chatapp.services;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RelativeLayout;
@@ -23,6 +26,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
+import com.karyagdi.hakan.chatapp.MainActivity;
 import com.karyagdi.hakan.chatapp.MessageTemplate;
 import com.karyagdi.hakan.chatapp.R;
 import com.karyagdi.hakan.chatapp.Utility.BaseService;
@@ -50,10 +54,11 @@ public class MessageService extends BaseService {
         mFirebaseAuth = FirebaseAuth.getInstance();
         //        DatabaseHelper=new DatabaseHelper(getApplicationContext());
         Log.v("Service message: ","Running");
-        String userId ="AtUYqKbRS4NQ0SVClZvyAr2cyxX2";
+        final String userId ="AtUYqKbRS4NQ0SVClZvyAr2cyxX2";
 
         // get message///////////////////////////////
         Query referance = mFirebaseDatabase.getReference("messages").orderByChild("authors/"+userId).equalTo(true);
+        final Vibrator vibra = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         referance.addChildEventListener(new ChildEventListener() {
             @Override
             public int hashCode() {
@@ -69,6 +74,12 @@ public class MessageService extends BaseService {
                             Long.valueOf(dataSnapshot.child("date").getValue().toString()),dataSnapshot.child("chat").getValue().toString());
                     message.setid(dataSnapshot.getKey());
                     getmMessage().createIfNotExists(message);
+                    if(!userId.equals(message.getsender()))
+                    {
+                        Log.v("userId: "+userId,"message: "+message.getsender());
+                        showNotification();
+                        vibra.vibrate(80);
+                    }
 
                 }
                 catch (SQLException e) {
@@ -78,7 +89,12 @@ public class MessageService extends BaseService {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                System.out.println("changed" + dataSnapshot.getValue());
+                if(!userId.equals(dataSnapshot.child("message").getValue().toString()))
+                {
+
+                    showNotification();
+                    vibra.vibrate(80);
+                }
             }
 
             @Override
@@ -169,28 +185,26 @@ public class MessageService extends BaseService {
         Log.v("Service message: ","Close");
     }
 
-    private void showNotification(String eventtext, Context ctx) {
+    private void showNotification()
+    {
+        Log.v("message","notify");
+        NotificationCompat.Builder mBuilder =   new NotificationCompat.Builder(getApplicationContext())
+                .setSmallIcon(R.drawable.ic_launcher) // notification icon
+                .setContentTitle("Notification!") // title for notification
+                .setContentText("Hello word") // message for notification
+                .setAutoCancel(true); // clear notification after click
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(""));
+        @SuppressLint("WrongConstant") PendingIntent pi = PendingIntent.getActivity(getBaseContext(),0,intent,Intent.FLAG_ACTIVITY_NEW_TASK);
+        mBuilder.setContentIntent(pi);
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(0, mBuilder.build());
 
 
 
-        //We get a reference to the NotificationManager
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        String MyText = "Reminder";
-        Notification mNotification = new Notification(R.drawable.ic_launcher, MyText, System.currentTimeMillis() );
-        //The three parameters are: 1. an icon, 2. a title, 3. time when the notification appears
 
-        String MyNotificationTitle = "Medicine!";
-        String MyNotificationText  = "Don't forget to take your medicine!";
 
-        Intent MyIntent = new Intent(Intent.ACTION_VIEW);
-        PendingIntent StartIntent = PendingIntent.getActivity(getApplicationContext(),0,MyIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-        //A PendingIntent will be fired when the notification is clicked. The FLAG_CANCEL_CURRENT flag cancels the pendingintent
-
-       // mNotification.Builder(getApplicationContext(), MyNotificationTitle, MyNotificationText, StartIntent);
-
-        int NOTIFICATION_ID = 1;
-        notificationManager.notify(NOTIFICATION_ID , mNotification);
     }
 
 }

@@ -1,5 +1,11 @@
 package com.karyagdi.hakan.chatapp;
 
+import android.annotation.SuppressLint;
+
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -8,6 +14,7 @@ import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateFormat;
@@ -130,7 +137,6 @@ public class MainActivity extends BaseActivity {
         btnSendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 EditText txtMessage = (EditText) findViewById(R.id.txtMessage);
 
                 try {
@@ -256,5 +262,11 @@ public class MainActivity extends BaseActivity {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
+
+private void showNotification()
+{
+
+
+}
 
 }
