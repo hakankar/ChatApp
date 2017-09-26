@@ -130,7 +130,8 @@ public class MainActivity extends BaseActivity {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        stopService(messageService);
+        startService(messageService);
 
         btnSendMessage = (FloatingActionButton)findViewById(R.id.btnSendMessage);
 
@@ -175,9 +176,8 @@ public class MainActivity extends BaseActivity {
         if(FirebaseAuth.getInstance().getCurrentUser() == null)
         {
             startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder().build(),SIGN_IN_REQUEST_CODE);
-            stopService(messageService);
-            // messageService.putExtra("CurrentUser", new Gson().toJson(FirebaseAuth.getInstance().getCurrentUser()));
-            startService(messageService);
+//            stopService(messageService);
+//            startService(messageService);
         }
         else
         {
@@ -244,7 +244,7 @@ public class MainActivity extends BaseActivity {
                         cursor.getString(cursor.getColumnIndex("DISPLAY_NAME")),
                         Long.valueOf(cursor.getString(cursor.getColumnIndex("DATE")))
                         ));
-                Log.v("MESSAGE:   ",cursor.getString(cursor.getColumnIndex("MESSAGE")));
+
             }
 
 

@@ -56,63 +56,8 @@ public class MessageService extends BaseService {
         Log.v("Service message: ","Running");
         final String userId ="AtUYqKbRS4NQ0SVClZvyAr2cyxX2";
 
-        // get message///////////////////////////////
-        Query referance = mFirebaseDatabase.getReference("messages").orderByChild("authors/"+userId).equalTo(true);
-        final Vibrator vibra = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        referance.addChildEventListener(new ChildEventListener() {
-            @Override
-            public int hashCode() {
-                return super.hashCode();
-            }
 
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                try {
 
-                    Message message = new Message(dataSnapshot.child("sender").getValue().toString(),
-                            dataSnapshot.child("message").getValue().toString(),
-                            Long.valueOf(dataSnapshot.child("date").getValue().toString()),dataSnapshot.child("chat").getValue().toString());
-                    message.setid(dataSnapshot.getKey());
-                    getmMessage().createIfNotExists(message);
-                    if(!userId.equals(message.getsender()))
-                    {
-                        Log.v("userId: "+userId,"message: "+message.getsender());
-                        showNotification();
-                        vibra.vibrate(80);
-                    }
-
-                }
-                catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                if(!userId.equals(dataSnapshot.child("message").getValue().toString()))
-                {
-
-                    showNotification();
-                    vibra.vibrate(80);
-                }
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Log.v("Removed ID: ",dataSnapshot.getKey());
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.v("HATA:  ",databaseError.getMessage());
-            }
-        });
-        ///////////////////////////////////////////////////////////////
         ///////////////////////USERS////////////////////////////////////
         Query userReferance = mFirebaseDatabase.getReference("users");
         userReferance.addChildEventListener(new ChildEventListener() {
@@ -155,6 +100,69 @@ public class MessageService extends BaseService {
                 Log.v("HATA:  ",databaseError.getMessage());
             }
         });
+
+
+
+        // ////////////////////////--------MESSAGES------////////////////////
+        Query referance = mFirebaseDatabase.getReference("messages").orderByChild("authors/"+userId).equalTo(true);
+        final Vibrator vibra = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        referance.addChildEventListener(new ChildEventListener() {
+            @Override
+            public int hashCode() {
+                return super.hashCode();
+            }
+
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                try {
+
+                    Message message = new Message(dataSnapshot.child("sender").getValue().toString(),
+                            dataSnapshot.child("message").getValue().toString(),
+                            Long.valueOf(dataSnapshot.child("date").getValue().toString()),dataSnapshot.child("chat").getValue().toString());
+                    message.setid(dataSnapshot.getKey());
+
+                    System.out.println("userId " + message.getsender());
+                    if(!userId.equals(message.getsender()) || getmMessage().queryForEq("ID",dataSnapshot.getKey()).size()==0)
+                    {
+                        getmMessage().createIfNotExists(message);
+                        User sender = getmUser().queryForEq("USER_ID",message.getsender()).get(0);
+                        showNotification(sender.getDisplayName(),message.getmessage());
+                        vibra.vibrate(500);
+                    }
+
+                }
+                catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                if(!userId.equals(dataSnapshot.child("message").getValue().toString()))
+                {
+
+//                    showNotification();
+//                   // vibra.vibrate(240);
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Log.v("Removed ID: ",dataSnapshot.getKey());
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.v("HATA:  ",databaseError.getMessage());
+            }
+        });
+        ///////////////////////////////////////////////////////////////
+
     }
 
     @Override
@@ -185,13 +193,12 @@ public class MessageService extends BaseService {
         Log.v("Service message: ","Close");
     }
 
-    private void showNotification()
+    private void showNotification(String title, String text)
     {
-        Log.v("message","notify");
         NotificationCompat.Builder mBuilder =   new NotificationCompat.Builder(getApplicationContext())
                 .setSmallIcon(R.drawable.ic_launcher) // notification icon
-                .setContentTitle("Notification!") // title for notification
-                .setContentText("Hello word") // message for notification
+                .setContentTitle(title) // title for notification
+                .setContentText(text) // message for notification
                 .setAutoCancel(true); // clear notification after click
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(""));
         @SuppressLint("WrongConstant") PendingIntent pi = PendingIntent.getActivity(getBaseContext(),0,intent,Intent.FLAG_ACTIVITY_NEW_TASK);

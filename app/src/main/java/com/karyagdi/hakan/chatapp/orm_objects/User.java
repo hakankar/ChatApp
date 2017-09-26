@@ -25,15 +25,8 @@ public class User  implements Serializable {
         this.id = id;
         this.displayName = displayName;
     }
-    /*public ArrayList<User> getFriends(int index) {
-        return friends;
+    public String getDisplayName()
+    {
+        return this.displayName;
     }
-
-    public void setFriends(ArrayList<User> friends) {
-        this.friends = friends;
-    }
-
-    public void addFriend(User friend) {
-        this.friends.add(friend);
-    }*/
 }
