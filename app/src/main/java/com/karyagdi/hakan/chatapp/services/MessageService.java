@@ -125,8 +125,8 @@ public class MessageService extends BaseService {
                     if(!userId.equals(message.getsender()) || getmMessage().queryForEq("ID",dataSnapshot.getKey()).size()==0)
                     {
                         getmMessage().createIfNotExists(message);
-                        User sender = getmUser().queryForEq("USER_ID",message.getsender()).get(0);
-                        showNotification(sender.getDisplayName(),message.getmessage());
+                        //User sender = getmUser().queryForEq("USER_ID",message.getsender()).get(0);
+                        showNotification("hakan",message.getmessage());
                         vibra.vibrate(500);
                     }
 
