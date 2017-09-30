@@ -46,7 +46,8 @@
                 android:src="@drawable/ic_send"
                 android:tint="@android:color/white"
                 app:fabSize="mini"
-                android:layout_gravity="center_vertical"/>
+                android:layout_gravity="center_vertical"
+                app:backgroundTint="@color/blue"/>
         </LinearLayout>
 
         <!--  <android.support.design.widget.TextInputLayout
