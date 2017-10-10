@@ -132,9 +132,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         mChatUser = null;
         mMessage = null;
         mUser = null;
+
         super.close();
     }
-
 
 
 }
